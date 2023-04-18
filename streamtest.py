@@ -21,32 +21,21 @@ visualize_ner(doc, labels=nlp.get_pipe("ner").labels, attrs=["text", "start_char
 s = nlp(doc)
 jsonout = []
 for ent in s.ents:
-        jsonout.append([ent.text, ent.start_char, ent.end_char, ent.label_, ent.kb_id_])
+    jsonout.append([ent.text, ent.start_char, ent.end_char, ent.label_, ent.kb_id_])
 
-    import pandas as pd
-    df = pd.DataFrame(jsonout, columns = ['Entity','Start','End','NERlab','Wikidata'])
-    #json_string = json.dumps(jsonout)
+import pandas as pd
+df = pd.DataFrame(jsonout, columns = ['Entity','Start','End','NERlab','Wikidata'])
 
-    #st.json(json_string, expanded=True)
+@st.experimental_memo
+def convert_df(df):
+    return df.to_csv(index=False).encode('utf-8')
 
-    #st.download_button(
-    #    label="Download JSON",
-    #    file_name="data.json",
-    #    mime="application/txt",
-    #    data=jsonout,
-    #)
+csv = convert_df(df)
 
-    @st.experimental_memo
-    def convert_df(df):
-           return df.to_csv(index=False).encode('utf-8')
-
-
-        csv = convert_df(df)
-
-        st.sidebar.download_button(
-                   "Press to Download",
-                   csv,
-                   "file.csv",
-                   "text/csv",
-                   key='download-csv'
-                )
+st.sidebar.download_button(
+"Press to Download",
+csv,
+"file.csv",
+"text/csv",
+key='download-csv'
+)
